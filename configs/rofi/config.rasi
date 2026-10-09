@@ -1,0 +1,168 @@
+/* Onduloscope — thème Rofi-Wayland « Outer Wilds » */
+
+configuration {
+    font: "JetBrains Mono 11";
+    show-icons: false;
+    disable-history: true;
+    sort: false;
+    matching: "normal";
+    case-sensitive: false;
+
+    /* Fermeture : clic en dehors du cadre, Échap, Alt+Tab ou Ctrl+G */
+    click-to-exit: true;
+    kb-cancel: "Escape,Alt+Tab,Control+g";
+
+    /* Raccourcis pilotant le script (kb-custom-N => ROFI_RETV = 9 + N) */
+    kb-custom-1: "Alt+f,Alt+F,Control+s";
+    kb-custom-2: "Left";
+    kb-custom-3: "Right";
+    kb-custom-4: "Up";
+    kb-custom-5: "Down";
+
+    /* Libérer les touches réaffectées */
+    kb-move-char-back: "Control+b";
+    kb-move-char-forward: "Control+f";
+    kb-move-word-forward: "Control+Right";
+    kb-row-up: "Control+p";
+    kb-row-down: "Control+n";
+}
+
+* {
+    bg:        #0b0e14;   /* opaque ; repasser à rgba(11, 14, 20, 85%) une fois le flou KWin actif */
+    cyan:      #5ff5e8;
+    amber:     #e58f2a;
+    pale:      #8be9fd;
+    grey:      #a0a8b7;
+    sel-bg:    rgba(229, 143, 42, 12%);
+
+    background-color: transparent;
+    text-color: @grey;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    location: center;
+    anchor: center;
+    width: 55%;
+    height: 50%;
+    background-color: @bg;
+    border: 2px;
+    border-color: @cyan;
+    padding: 12px;
+}
+
+mainbox {
+    orientation: vertical;
+    spacing: 8px;
+    children: [ inputbar, tuner-box, content-box, textbox-footer ];
+}
+
+/* Zone 1 — champ de détection */
+inputbar {
+    orientation: horizontal;
+    expand: false;
+    children: [ textbox-label, entry ];
+    padding: 5px 10px;
+    border: 1px;
+    border-color: @cyan;
+}
+textbox-label {
+    str: "LOCALISER SIGNAL > ";
+    expand: false;
+    text-color: @cyan;
+}
+entry {
+    expand: true;
+    horizontal-align: 0;
+    text-color: @amber;
+    placeholder: "";
+    cursor-color: @amber;
+}
+
+/* Zone 2 — sélecteur de fréquence (texte + balisage Pango fournis par le script).
+   Centrage par cales : dummy1 et dummy2 absorbent à parts égales l'espace restant,
+   prompt (taille automatique) reste au milieu et tuner-box occupe toute la largeur.
+   expand: false sur tuner-box : en « true » il se partagerait la hauteur avec content-box. */
+tuner-box {
+    orientation: horizontal;
+    expand: false;
+    children: [ dummy1, prompt, dummy2 ];
+    padding: 6px 10px;
+    border: 1px;
+    border-color: @cyan;
+}
+dummy1, dummy2 {
+    expand: true;
+}
+prompt {
+    expand: false;
+    markup: true;
+    text-color: @amber;
+}
+
+/* Zones 3 et 4 */
+content-box {
+    orientation: horizontal;
+    expand: true;
+    spacing: 8px;
+    children: [ listview, message ];
+}
+
+/* Zone 3 — registre des signaux */
+listview {
+    columns: 1;
+    lines: 8;
+    scrollbar: false;
+    expand: true;
+    fixed-height: true;
+    padding: 5px;
+    border: 1px;
+    border-color: @cyan;
+}
+
+/* Aucun fond par défaut : tous les états sont transparents… */
+element,
+element normal.normal, element normal.urgent, element normal.active,
+element alternate.normal, element alternate.urgent, element alternate.active {
+    padding: 3px 8px;
+    background-color: transparent;
+    text-color: @grey;
+}
+/* …sauf la ligne sélectionnée : voile ambre + texte ambre. */
+element selected.normal, element selected.urgent, element selected.active {
+    padding: 3px 8px;
+    background-color: @sel-bg;
+    text-color: @amber;
+}
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    highlight: none;
+}
+
+/* Zone 4 — télémétrie */
+/* Deux enfants « expand: true » dans une box horizontale se partagent
+   l'espace à parts égales : listview 50 % / message 50 %. */
+message {
+    expand: true;
+    children: [ textbox ];
+    padding: 8px;
+    border: 1px;
+    border-color: @cyan;
+}
+textbox {
+    text-color: @pale;
+    vertical-align: 0;
+    markup: true;
+}
+
+/* Pied de page */
+textbox-footer {
+    expand: false;
+    str: "[ENTRÉE] INITIALISER LE MODULE  —  [ÉCHAP] RETOUR AU COCKPIT  —  [ALT+F] BASCULER FAVORIS";
+    text-color: @grey;
+    horizontal-align: 0.5;
+}

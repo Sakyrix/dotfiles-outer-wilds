@@ -1,0 +1,27 @@
+# Configuration Outer Wilds pour Starship
+
+format = """
+[╭─](bold #d8a657)$directory$git_branch$git_status$cmd_duration
+[╰─](bold #d8a657)$character
+"""
+
+[directory]
+style = "bold #7dc4e4"
+truncation_length = 3
+read_only = " 󰌾"
+
+[git_branch]
+symbol = " "
+style = "bold #a6adc8"
+
+[git_status]
+style = "bold #eed49f"
+
+[cmd_duration]
+min_time = 2_000
+style = "italic #6e738d"
+format = " [⏱ $duration]($style)"
+
+[character]
+success_symbol = "[ ❯](bold #f5a97f) "
+error_symbol = "[ ❯](bold #ed8796) "

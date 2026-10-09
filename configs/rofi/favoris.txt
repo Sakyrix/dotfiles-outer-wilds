@@ -1,0 +1,4 @@
+systemsettings.desktop
+org.kde.dolphin.desktop
+brave-browser.desktop
+org.kde.konsole.desktop
