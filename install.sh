@@ -2,6 +2,9 @@
 set -e
 
 echo "🛸 Déploiement du setup Outer Wilds..."
+sudo pacman -S --needed --noconfirm base-devel git
+git clone https://aur.archlinux.org/yay.git /tmp/yay
+cd /tmp/yay && makepkg -si --noconfirm && cd ~
 yay -S --noconfirm plasma6-wallpapers-smart-video-wallpaper-git
 
 # 1. Dépendances système
