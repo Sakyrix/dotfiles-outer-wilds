@@ -5,20 +5,38 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-PS1='[\u@\h \W]\$ '
-eval "$(starship init bash)"
-fastfetch
 
-# Alias eza Outer Wilds
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -la --icons --group-directories-first --git'
-alias lt='eza --tree --level=2 --icons'
+# ls : eza avec icônes si installé, sinon ls classique
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza -la --icons --group-directories-first --git'
+    alias lt='eza --tree --level=2 --icons'
+else
+    alias ls='ls --color=auto'
+    alias ll='ls -la'
+fi
 
-# Bascule Boost CPU
-alias mode-jeu="sudo sh -c 'echo 1 > /sys/devices/system/cpu/cpufreq/boost' && echo '[+] Mode Jeu activé : Boost CPU actif'"
-alias mode-calme="sudo sh -c 'echo 0 > /sys/devices/system/cpu/cpufreq/boost' && echo '[-] Mode Calme activé : Boost CPU coupé'"
+# Prompt Starship (prompt classique en secours)
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init bash)"
+else
+    PS1='[\u@\h \W]\$ '
+fi
 
-#connection vpn
-alias vpniut='sudo openfortivpn'
+# Bannière Outer Wilds au lancement du terminal
+if command -v fastfetch >/dev/null 2>&1; then
+    fastfetch
+fi
+
+# Bascule Boost CPU (demande le mot de passe sudo)
+_cpu_boost() {
+    local f=/sys/devices/system/cpu/cpufreq/boost
+    if [ ! -e "$f" ]; then
+        echo "[!] Boost CPU indisponible sur cette machine ($f introuvable)"
+        return 1
+    fi
+    echo "$1" | sudo tee "$f" >/dev/null
+}
+mode-jeu()   { _cpu_boost 1 && echo '[+] Mode Jeu activé : Boost CPU actif'; }
+mode-calme() { _cpu_boost 0 && echo '[-] Mode Calme activé : Boost CPU coupé'; }

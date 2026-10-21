@@ -1,25 +1,33 @@
 # rofi-outer-wilds — Onduloscope
 
-Lanceur d'applications Rofi-Wayland (mode script Python) inspiré d'Outer Wilds.
+Lanceur d'applications Rofi (mode script Python) inspiré d'Outer Wilds.
 
 ## Installation (Arch / KDE Plasma 6)
 
+Le plus simple : lancer `./install.sh` à la racine du dépôt. Il installe les
+dépendances et copie ce dossier dans `~/.config/rofi/`.
+
+À la main :
+
 ```bash
-sudo pacman -S rofi-wayland ttf-jetbrains-mono python
-git clone <votre-repo> ~/.config/rofi-outer-wilds
-chmod +x ~/.config/rofi-outer-wilds/run.sh ~/.config/rofi-outer-wilds/launcher.py
+sudo pacman -S rofi ttf-jetbrains-mono-nerd python
+mkdir -p ~/.config/rofi && cp -r configs/rofi/* ~/.config/rofi/
+chmod +x ~/.config/rofi/run.sh ~/.config/rofi/launcher.py
 ```
+
+Rofi ≥ 2.0 est nécessaire : le support Wayland (ex-`rofi-wayland`) est intégré
+au paquet `rofi` officiel.
 
 ## Test immédiat
 
 ```bash
-~/.config/rofi-outer-wilds/run.sh
+~/.config/rofi/run.sh
 ```
 
 ## Raccourci global KDE Plasma 6
 
 Paramètres système → Raccourcis → Ajouter une commande…
-- Commande : `/home/VOTRE_NOM/.config/rofi-outer-wilds/run.sh`
+- Commande : `~/.config/rofi/run.sh` (chemin complet : `/home/VOTRE_NOM/.config/rofi/run.sh`)
 - Assignez par ex. `Meta+Espace`.
 
 ## Flou d'arrière-plan (KWin)
@@ -37,6 +45,9 @@ des règles « Position » / « Taille » sur la même classe.
 `favoris.txt` : un identifiant `.desktop` (ou nom d'exécutable) par ligne.
 `Alt+F` ajoute/retire le module sélectionné.
 
+`state.json` et `stats.json` (état de l'interface, historique des 50 derniers
+lancements) sont créés automatiquement à l'usage et ne sont pas versionnés.
+
 ## Limites connues de Rofi
 
 - L'effet machine à écrire n'est pas réalisable : Rofi n'affiche que le
@@ -48,5 +59,5 @@ des règles « Position » / « Taille » sur la même classe.
 - Avec un filtre saisi, les flèches Haut/Bas parcourent la liste complète de
   la fréquence, pas seulement les résultats filtrés.
 - Le comportement exact des widgets (prompt/message déplacés dans le layout)
-  dépend de la version de rofi-wayland : ce thème n'a pas pu être testé sous
+  dépend de la version de rofi : ce thème n'a pas pu être testé sous
   Rofi ici, seul le backend Python a été vérifié.
