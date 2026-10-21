@@ -2,16 +2,15 @@
 set -e
 
 echo "🛸 Déploiement du setup Outer Wilds..."
+yay -S --noconfirm plasma6-wallpapers-smart-video-wallpaper-git
 
-# 1. Installation des paquets requis
-echo "📦 Installation des dépendances..."
+# 1. Dépendances système
 sudo pacman -S --needed --noconfirm rofi starship fastfetch konsole qt6-multimedia ffmpegthumbs
 
-# 2. Création des dossiers cibles
+# 2. Dossiers
 mkdir -p ~/.config/rofi ~/.config/fastfetch ~/.local/share/icons ~/.local/share/konsole ~/.local/share/wallpapers
 
-# 3. Copie des ressources et configurations
-echo "📂 Copie des fichiers..."
+# 3. Copie des fichiers
 cp -r assets/icons/Outer-Wilds ~/.local/share/icons/ 2>/dev/null || true
 cp -r assets/wallpapers/* ~/.local/share/wallpapers/ 2>/dev/null || true
 
@@ -21,19 +20,21 @@ cp configs/terminal/starship.toml ~/.config/
 cp configs/terminal/bashrc ~/.bashrc
 cp configs/terminal/'Profil 1.profile' ~/.local/share/konsole/ 2>/dev/null || true
 
-# Layout KDE (Panneaux, barre de vie, couleurs, fenêtres)
+# Remplacement des chemins hardcodés vers le home de l'utilisateur courant
+sed -i "s|/home/[^/]*|$HOME|g" configs/kde/plasma-org.kde.plasma.desktop-appletsrc 2>/dev/null || true
+
+# Fermer Plasma temporairement pour réécrire le fichier de disposition sans qu'il soit écrasé
+kquitapp6 plasmashell 2>/dev/null || true
+sleep 1
+
 cp configs/kde/plasma-org.kde.plasma.desktop-appletsrc ~/.config/ 2>/dev/null || true
 cp configs/kde/kdeglobals ~/.config/ 2>/dev/null || true
 cp configs/kde/kwinrc ~/.config/ 2>/dev/null || true
-cp configs/kde/kscreenlockerrc ~/.config/ 2>/dev/null || true
 
-# 4. Configuration SDDM (si présent)
-if [ -d "configs/sddm" ]; then
-    sudo mkdir -p /etc/sddm.conf.d
-    sudo cp configs/sddm/theme.conf /etc/sddm.conf.d/ 2>/dev/null || true
-    if [ -d "/usr/share/sddm/themes/sddm-astronaut-theme/Themes" ]; then
-        sudo cp configs/sddm/astronaut.conf /usr/share/sddm/themes/sddm-astronaut-theme/Themes/ 2>/dev/null || true
-    fi
-fi
+# Relancer Plasma
+kstart plasmashell &>/dev/null &
 
-echo "✅ Fichiers installés ! Redémarre ta session KDE pour appliquer la disposition."
+# Appliquer le curseur
+plasma-apply-cursortheme Outer-Wilds 2>/dev/null || true
+
+echo "✅ Terminé ! Redémarre ta session."
