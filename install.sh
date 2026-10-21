@@ -2,31 +2,48 @@
 set -e
 
 echo "🛸 Déploiement du setup Outer Wilds..."
-sudo pacman -S --needed --noconfirm base-devel git
-git clone https://aur.archlinux.org/yay.git /tmp/yay
-cd /tmp/yay && makepkg -si --noconfirm && cd ~
-yay -S --noconfirm plasma6-wallpapers-smart-video-wallpaper-git
 
-# 1. Dépendances système
-sudo pacman -S --needed --noconfirm rofi starship fastfetch konsole qt6-multimedia ffmpegthumbs
+# 1. Empêcher de lancer le script directement avec sudo
+if [ "$EUID" -eq 0 ]; then
+  echo "❌ Ne lance pas ce script avec sudo ! Exécute-le simplement avec : ./install.sh"
+  exit 1
+fi
 
-# 2. Dossiers
+# 2. Installation des paquets officiels Arch
+echo "📦 Installation des dépendances système..."
+sudo pacman -S --needed --noconfirm base-devel git rofi starship fastfetch konsole qt6-multimedia ffmpegthumbs
+
+# 3. Installation de yay si absent
+if ! command -v yay &>/dev/null; then
+    echo "📦 Installation de yay..."
+    rm -rf /tmp/yay
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    (cd /tmp/yay && makepkg -si --noconfirm)
+    rm -rf /tmp/yay
+fi
+
+# 4. Installation du plugin vidéo AUR (avec nom corrigé + sécurité)
+echo "🎥 Installation du plugin vidéo..."
+yay -S --needed --noconfirm smart-video-wallpaper-git 2>/dev/null || true
+
+# 5. Création des dossiers cibles
 mkdir -p ~/.config/rofi ~/.config/fastfetch ~/.local/share/icons ~/.local/share/konsole ~/.local/share/wallpapers
 
-# 3. Copie des fichiers
+# 6. Copie des ressources et configurations
+echo "📂 Copie des fichiers de configuration..."
 cp -r assets/icons/Outer-Wilds ~/.local/share/icons/ 2>/dev/null || true
 cp -r assets/wallpapers/* ~/.local/share/wallpapers/ 2>/dev/null || true
 
 cp -r configs/rofi/* ~/.config/rofi/ 2>/dev/null || true
 cp -r configs/fastfetch/* ~/.config/fastfetch/ 2>/dev/null || true
-cp configs/terminal/starship.toml ~/.config/
-cp configs/terminal/bashrc ~/.bashrc
+cp configs/terminal/starship.toml ~/.config/ 2>/dev/null || true
+cp configs/terminal/bashrc ~/.bashrc 2>/dev/null || true
 cp configs/terminal/'Profil 1.profile' ~/.local/share/konsole/ 2>/dev/null || true
 
-# Remplacement des chemins hardcodés vers le home de l'utilisateur courant
+# Adaptation dynamique des chemins
 sed -i "s|/home/[^/]*|$HOME|g" configs/kde/plasma-org.kde.plasma.desktop-appletsrc 2>/dev/null || true
 
-# Fermer Plasma temporairement pour réécrire le fichier de disposition sans qu'il soit écrasé
+# Réécriture propre du panneau KDE
 kquitapp6 plasmashell 2>/dev/null || true
 sleep 1
 
